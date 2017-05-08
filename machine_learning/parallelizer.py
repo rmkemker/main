@@ -1,4 +1,14 @@
-#! coding: utf8
+"""
+Name: parallizer.py
+Author: Ronald Kemker
+Description: Parallelize Keras Models
+
+Note:
+Requires Tensorflow, Keras
+https://www.tensorflow.org/
+https://keras.io/
+"""
+
 import keras.backend as K
 from keras.layers import Lambda, merge, concatenate
 from keras.models import Model
