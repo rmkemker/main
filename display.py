@@ -1,7 +1,8 @@
 """
 Name: display.py
 Author: Ronald Kemker
-Description: Various display and storing helper functions.
+Description: Various display and image storing helper functions.  Very helpful
+for figures in publications.
 
 I need to fix the documentation in here.
 """
@@ -17,6 +18,16 @@ from colorsys import rgb_to_hsv, hsv_to_rgb
             float32(float32),
             float64(float64)])
 def rgbToHSV(data):
+    """Convert image from RGB to HSV
+    
+    Parameters
+    ----------
+    data : numpy array [rows x columns x channels], input RGB image
+    
+    Returns
+    -------
+    output : numpy array [rows x columns x channels], output HSV image
+    """
     dataSize = data.shape
     output = np.zeros([np.prod(dataSize[0:2]),3])
 
@@ -31,6 +42,16 @@ def rgbToHSV(data):
         float32(float32),
         float64(float64)])
 def hsvToRGB(data):
+    """Convert image from HSV to RGB
+    
+    Parameters
+    ----------
+    data : numpy array [rows x columns x channels], input HSV image
+    
+    Returns
+    -------
+    output : numpy array [rows x columns x channels], output RGB image
+    """
     dataSize = data.shape
     output = np.zeros([np.prod(dataSize[0:2]),3])
 
@@ -40,42 +61,32 @@ def hsvToRGB(data):
     
     return output.reshape(dataSize)
 
-@vectorize([int32(int32),
-            int64(int64),
-            float32(float32),
-            float64(float64),
-            uint16(uint16)])    
-def histEq(data):
-    dataSize = data.shape
-    hist = np.histogram(data,bins=256)[0]
-    p = hist/np.prod(dataSize)
-    T = np.floor(255*np.cumsum(p))    
-    return T[data.astype(int)]
-
-def imshow(data, equalize=False):
-    '''
-    imshow - stretch color image to fit in Matplotlib imshow
-    Input:
-           data - numpy array (height, width, 3)
-    '''    
+def imshow(data):
+    """imshow for arbitrary (non-UINT8) image
+    
+    Parameters
+    ----------
+    data : numpy array [rows x columns x channels], input RGB image
+    """   
     sh = data.shape
     if len(sh) > 2:    
         data = data.reshape(-1,3)
     else:
         data = data.ravel()
     data = MinMaxScaler().fit_transform(data)*255.0
-    
-    if equalize:
-        data = histEq(data)
-    
+        
     plt.imshow(np.uint8(data.reshape(sh)))
 
-def imsave(data, fName, equalize=False, dpi=600):    
-    '''
-    imsave - Save high-quality image
-    Input:
-           data - numpy array (height, width, 3)
-    '''    
+def imsave(data, fName, dpi=600):    
+    """Save figure with no border
+    
+    Parameters
+    ----------
+    data : numpy array [rows x columns x channels], input image
+	fName : string, file path to save image
+	dpi : int, dots-per-inch (Default: 600)
+    
+    """   
     sh = data.shape
     
     if len(sh) > 2:    
@@ -84,10 +95,7 @@ def imsave(data, fName, equalize=False, dpi=600):
         data = data.ravel()
         
     data = MinMaxScaler().fit_transform(data)*255.0
-    
-    if equalize:
-        data = histEq(data)
-    
+        
     fig = plt.figure(frameon=False)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
@@ -103,29 +111,49 @@ def discrete_cmap(N, base_cmap=None):
     cmap_name = base.name + str(N)
     return base.from_list(cmap_name, color_list, N)
 
-def classmap_show(data, cmap=None, numClasses = None):
+def classmap_show(data, cmap=None, num_classes = None):
+	"""Show a classification (semantic/instance segmentation) map
 
-    if numClasses is None:
-        numClasses = np.max(data)
+    Parameters
+    ----------
+    data : numpy array of integers [rows x columns], classification image
+    cmap : custom colormap (Default : None -> Builds it from discrete_cmap)
+	num_classes : integer, total number of distinct classes 
+		(Default: None -> uses max value in input class map)
+    """	
+
+    if num_classes is None:
+        num_classes = np.max(data)
 
     if cmap is None:
-        cmap = discrete_cmap(numClasses)
+        cmap = discrete_cmap(num_classes)
 
-    plt.imshow(data,cmap=cmap,vmin=0, vmax=numClasses-1)
+    plt.imshow(data,cmap=cmap,vmin=0, vmax=num_classes-1)
 
-def classmap_save(data, fname, cmap=None, numClasses=None, dpi=300):
+def classmap_save(data, fname, cmap=None, num_classes=None, dpi=300):
+	"""Save a classification (semantic/instance segmentation) map
+
+    Parameters
+    ----------
+    data : numpy array of integers [rows x columns], classification image
+	fName : string, file path to save image
+    cmap : custom colormap (Default : None -> Builds it from discrete_cmap)
+	num_classes : integer, total number of distinct classes 
+		(Default: None -> uses max value in input class map)
+	dpi : int, dots-per-inch (Default: 300)
+    """	
     fig = plt.figure(frameon=False)
     data = np.uint8(data)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
     ax.set_axis_off()
     fig.add_axes(ax)
     
-    if numClasses is None:
-        numClasses = np.max(data)
+    if num_classes is None:
+        num_classes = np.max(data)
 
     if cmap is None:
-        cmap = discrete_cmap(numClasses)
+        cmap = discrete_cmap(num_classes)
 
-    ax.imshow(data, aspect='auto', cmap=cmap,vmin=0, vmax=numClasses-1)
+    ax.imshow(data, aspect='auto', cmap=cmap,vmin=0, vmax=num_classes-1)
     fig.savefig(fname,dpi=dpi)
     plt.close()
