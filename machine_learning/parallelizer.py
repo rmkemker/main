@@ -12,7 +12,7 @@ class Parallelizer(object):
     This takes a keras model and parallelizes it between multiple GPUs.  This
     class requires Tensorflow and Keras.
     
-    Paramaters
+    Parameters
     ----------
     gpu_list : list of int, None
         If None, the model is trained on all available GPUs.
