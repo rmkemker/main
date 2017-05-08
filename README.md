@@ -1,4 +1,4 @@
-# Repository for Ron Kemker
+# My Repository
 This is a repository of common helper functions that I have built for other projects.  I need to transfer these files over from my private BitBucket account, which I will do soon.  This will be used for other projects that I will make available over time too.
 
 ## Contact Information
