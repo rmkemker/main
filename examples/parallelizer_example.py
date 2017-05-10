@@ -1,3 +1,16 @@
+"""
+Name: parallizer.py
+Author: Ronald Kemker
+Description: Parallelize Keras Models
+
+Note:
+Requires Tensorflow, Keras
+https://www.tensorflow.org/
+https://keras.io/
+
+Tested on Ubuntu 16.04, Anaconda Python 3.6, 4x NVIDIA Titan X GPUs
+"""
+
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.datasets import mnist
