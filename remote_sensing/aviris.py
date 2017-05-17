@@ -57,7 +57,7 @@ class AVIRIS():
         pass
     
     def read(self):
-		"""Reads orthomosaic, calculates binary mask, performs radiometric
+        """Reads orthomosaic, calculates binary mask, performs radiometric
 		calibration (optional), and band resamples (optional)"""
         f = glob(self.dName+'/*ort_img')[0]
         self.data = gdal.Open(f).ReadAsArray().transpose(1,2,0)
@@ -84,23 +84,23 @@ class AVIRIS():
         self.data[self.mask] = np.float32(self.data[self.mask])*gain
     
     def show_rgb(self):
-		"""Displays RGB visualization of HSI cube"""
-		from display import imshow
+        """Displays RGB visualization of HSI cube"""
+        from display import imshow
         idx = np.array([13,19,27], dtype=np.uint8)
         imshow(self.data[:,:,idx])
     
     def hdr_data(self):
-		"""Finds band-centers and full-width half-maxes of hyperspectral cube"""
+        """Finds band-centers and full-width half-maxes of hyperspectral cube"""
         f = glob(self.dName+'/*ort_img.hdr')[0]        
         self.bands, self.fwhm = readENVIHeader(f)
         
     def band_resample(self):
-		"""Performs band resampling operation"""
+        """Performs band resampling operation"""
         self.data = band_resample_hsi_cube(self.data,self.bands,self.tgt_bands,
                                            self.fwhm, self.tgt_fwhm,
                                            self.mask)
         
     def _mask_value(self):
-		"""Finds value of invalid orthomosaic pixels"""
+        """Finds value of invalid orthomosaic pixels"""
         return np.min([self.data[0,-1],self.data[-1,0],self.data[0,-1],
                        self.data[-1,-1]])

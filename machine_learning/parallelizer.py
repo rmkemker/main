@@ -119,11 +119,28 @@ class Parallelizer(object):
        
         # all output tensors on CPU
         with tf.device('/cpu:0'):
-            return Model(
-                inputs=model.inputs,
-                outputs=[
-                    # merge outputs from all GPU
-                    concatenate(o, axis=0, name=o[0].name.split('/')[-2])
-                    for o in outputs_all
-                ]
-            )
+            if self.n_gpus > 1:
+            
+                return Model(
+                    inputs=model.inputs,
+                    outputs=[
+                        # merge outputs from all GPU
+                        concatenate(o, axis=0, name=o[0].name.split('/')[-2])
+                        for o in outputs_all
+                    ]
+                )
+            else:
+                return Model(inputs=model.inputs, outputs=outputs_all[0],
+                             name=outputs_all[0][0].name.split('/')[-2])
+                
+if __name__ is '__main__':
+    
+    from keras.models import Sequential
+    from keras.layers import Dense
+    model = Sequential()
+    model.add(Dense(64, input_shape=(16,)))
+    model.add(Dense(64))
+    
+    par = Parallelizer(gpu_list=[1])
+    model = par.transform(model)
+    
