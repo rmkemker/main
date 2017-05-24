@@ -1,7 +1,7 @@
 """
-Name: aviris.py
+Name: hyperion.py
 Author: Ronald Kemker
-Description: Pipeline for processing AVIRIS imagery
+Description: Pipeline for processing Hyperion imagery
 
 Note:
 Requires GDAL, remote_sensing.utils, and display (optional)
@@ -45,7 +45,7 @@ class Hyperion():
 
     Notes
     -----
-	Ref: https://aviris.jpl.nasa.gov/
+	Ref: https://eo1.usgs.gov/sensors/hyperion
     
     """      
     def __init__(self , directory, calibrate = True, bands=None, fwhm=None):
