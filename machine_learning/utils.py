@@ -9,7 +9,6 @@ Created on Wed Feb 22 13:06:19 2017
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-#TODO: Need to add documentation
 
 def class_weights(labels, mu , numClasses=None):
     if numClasses is None:
