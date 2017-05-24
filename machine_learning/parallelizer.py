@@ -141,6 +141,6 @@ if __name__ is '__main__':
     model.add(Dense(64, input_shape=(16,)))
     model.add(Dense(64))
     
-    par = Parallelizer(gpu_list=[1])
+    par = Parallelizer(gpu_list=[1,2,3])
     model = par.transform(model)
     

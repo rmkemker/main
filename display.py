@@ -83,8 +83,8 @@ def imsave(data, fName, dpi=600):
     Parameters
     ----------
     data : numpy array [rows x columns x channels], input image
-	fName : string, file path to save image
-	dpi : int, dots-per-inch (Default: 600)
+    fName : string, file path to save image
+    dpi : int, dots-per-inch (Default: 600)
     
     """   
     sh = data.shape
@@ -112,36 +112,35 @@ def discrete_cmap(N, base_cmap=None):
     return base.from_list(cmap_name, color_list, N)
 
 def classmap_show(data, cmap=None, num_classes = None):
-	"""Show a classification (semantic/instance segmentation) map
+    """Show a classification (semantic/instance segmentation) map
 
     Parameters
     ----------
     data : numpy array of integers [rows x columns], classification image
     cmap : custom colormap (Default : None -> Builds it from discrete_cmap)
-	num_classes : integer, total number of distinct classes 
-		(Default: None -> uses max value in input class map)
-    """	
-
+    num_classes : integer, total number of distinct classes 
+        (Default: None -> uses max value in input class map)
+    """    
     if num_classes is None:
         num_classes = np.max(data)
-
+    
     if cmap is None:
         cmap = discrete_cmap(num_classes)
-
+    
     plt.imshow(data,cmap=cmap,vmin=0, vmax=num_classes-1)
 
 def classmap_save(data, fname, cmap=None, num_classes=None, dpi=300):
-	"""Save a classification (semantic/instance segmentation) map
+    """Save a classification (semantic/instance segmentation) map
 
     Parameters
     ----------
     data : numpy array of integers [rows x columns], classification image
-	fName : string, file path to save image
+    fName : string, file path to save image
     cmap : custom colormap (Default : None -> Builds it from discrete_cmap)
-	num_classes : integer, total number of distinct classes 
-		(Default: None -> uses max value in input class map)
-	dpi : int, dots-per-inch (Default: 300)
-    """	
+    num_classes : integer, total number of distinct classes 
+        (Default: None -> uses max value in input class map)
+    dpi : int, dots-per-inch (Default: 300)
+    """    
     fig = plt.figure(frameon=False)
     data = np.uint8(data)
     ax = plt.Axes(fig, [0., 0., 1., 1.])
