@@ -3,12 +3,13 @@
 """
 Created on Wed Feb 22 13:06:19 2017
 
-@author: rmkemker
+@author: Ronald Kemker
 """
 
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+
+#TODO: Need to add documentation
 
 def class_weights(labels, mu , numClasses=None):
     if numClasses is None:
@@ -50,7 +51,6 @@ def set_gpu(device=None):
     
     if device is None:
         device=""
-    #TODO:  Check to see if device is available before setting
     os.environ['CUDA_VISIBLE_DEVICES'] = str(device)
 
     
