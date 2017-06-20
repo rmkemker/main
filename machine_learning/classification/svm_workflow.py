@@ -11,20 +11,15 @@ Requires scikit-learn
 from sklearn.svm import LinearSVC
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV, PredefinedSplit
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
 import numpy as np
 
 class SVM_Workflow():
     
-    def __init__(self, kernel='linear', standard_scaler=True, n_jobs=8,
-                 verbosity = 10, pca_components=None, whiten=True):
+    def __init__(self, kernel='linear', n_jobs=8, verbosity = 10):
         self.kernel = kernel
-        self.scale = standard_scaler
         self.n_jobs = n_jobs
         self.verbose = verbosity
-        self.pca = pca_components
-        self.whiten = whiten
+
                 
     def fit(self, train_data, train_labels, val_data, val_labels):
         split = np.append(-np.ones(train_labels.shape, dtype=np.float32),
@@ -34,14 +29,6 @@ class SVM_Workflow():
         train_data = np.append(train_data, val_data , axis=0)
         train_labels = np.append(train_labels , val_labels, axis=0)
         del val_data, val_labels
-        
-        if self.scale:
-            self.sclr = StandardScaler()
-            train_data = self.sclr.fit_transform(train_data)
-        
-        if self.pca is not None:
-            self.pca = PCA(n_components=self.pca, whiten=self.whiten)
-            train_data = self.pca.fit_transform(train_data)
         
         if self.kernel == 'linear':        
             clf = LinearSVC(class_weight='balanced', dual=False,random_state=6,
@@ -75,23 +62,10 @@ class SVM_Workflow():
         
         self.gs = GridSearchCV(clf, params, refit=True, n_jobs=self.n_jobs,  
                           verbose=self.verbose, cv=ps)
-        return self.gs.fit(train_data, train_labels)
+        self.gs.fit(train_data, train_labels)
                 
-    def predict(self, test_data):
-        
-        if self.scale:
-            test_data = self.sclr.transform(test_data)
-        
-        if self.pca is not None:
-            test_data = self.pca.transform(test_data)
-        
+    def predict(self, test_data):       
         return self.gs.predict(test_data)
         
-    def predict_proba(self, test_data):
-        if self.scale:
-            test_data = self.sclr.transform(test_data)
-        
-        if self.pca is not None:
-            test_data = self.pca.transform(test_data)
-        
-        self.gs.predict_proba(test_data)
+    def predict_proba(self, test_data):              
+        return self.gs.predict_proba(test_data)

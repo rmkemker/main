@@ -31,9 +31,7 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
                  batch_normalization=True, activation='relu', save_fname=None,
                  patience = 6, lr=2e-3, min_lr = 2e-6, verbose = 2, mu=None,
                  refit = False, gpu_list = None, optimizer=None, nb_epochs=1000,
-                 kernel_initializer = 'glorot_normal', standard_scaler=True,
-                 lr_patience = 3, train_size=None, test_size=None,
-                 pca_components = None , whiten=True):
+                 kernel_initializer = 'glorot_normal', lr_patience = 3):
         
         self.model = Sequential()
         self.hidden = hidden_layer_shape
@@ -51,15 +49,6 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         self.gpus = gpu_list
         self.ki = kernel_initializer
         self.lr_patience = lr_patience
-        self.train_size = train_size
-        self.test_size = test_size
-        self.pc = pca_components
-        self.whiten = whiten
-        
-        if standard_scaler is True:
-            self.sclr = ImagePreprocessor()
-        else:
-            self.sclr = None
                                        
         if optimizer is None:
             self.opt = Nadam(self.lr)
@@ -89,27 +78,12 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
                              kernel_regularizer=l2(self.wd),
                              kernel_initializer=self.ki))
     
-    def fit(self, X_train, y_train, X_val=None, y_val=None, batch_size=256):
+    def fit(self, X_train, y_train, X_val, y_val, batch_size=256):
 
         self.N = len(np.bincount(y_train))
 
-                
         X_train = np.float32(X_train)
-        
-        if X_val is not None:
-            X_val = np.float32(X_val)
-        else:
-            X_train, X_val, y_train, y_val = split_folds(X_train, 
-                                                    y_train,
-                                                    test_size=self.test_size,
-                                                    train_size=self.train_size)
-        
-        if self.pc is not None:
-            self.pca = PCA(n_components=self.pc, whiten=self.whiten)
-            self.pca.fit(np.append(X_train, X_val,axis=0))
-            X_train = self.pca.transform(X_train)
-            X_val = self.pca.transform(X_val)
-
+        X_val = np.float32(X_val)
         
         self._model(X_train.shape)            
         if self.gpus is not None:
@@ -158,13 +132,6 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
             self.model.compile(optimizer=self.opt, metrics=['accuracy'], 
                                loss='binary_crossentropy')
 
-
-        if self.sclr is not None:
-            self.sclr.fit(np.append(X_train, X_val,axis=0))
-            X_train = self.sclr.transform(X_train)
-            X_val = self.sclr.transform(X_val)
-            
-
         history = self.model.fit(X_train, y_train,
             epochs=self.epochs,
             batch_size=batch_size,
@@ -180,20 +147,9 @@ class MLPClassifier(BaseEstimator, ClassifierMixin):
         return history
     
     def predict(self,X):
-        
-        if self.pc is not None:
-            X = self.pca.transform(X)
-        
-        if self.sclr is not None:
-            X = self.sclr.transform(X)
         return np.argmax(self.model.predict(X), axis=1)
     
     def predict_proba(self, X):
-        if self.pc is not None:
-            X = self.pca.transform(X)
-        if self.sclr is not None:
-            X = self.sclr.transform(X)
-            
         return self.model.predict(X)
     
 #if __name__ == "__main__":

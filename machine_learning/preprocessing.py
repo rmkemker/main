@@ -117,7 +117,7 @@ class ImagePreprocessor():
         elif self.mode == 'ZCAWhiten':
             return self.sclr.ZCAMatrix
            
-if __name__ == "__main__":     
+if __name__ == '__main__':   
     sclr = ImagePreprocessor('GlobalContrastNormalization')
     x = np.random.rand(100, 32,32, 3) * 255
     sclr.fit(x)
